@@ -1,6 +1,9 @@
-This is from https://github.com/tux-mind/libbthread by tux-mind
+This is forked and modified from https://github.com/tux-mind/libbthread by tux-mind
 
-The author says:
+I did some minor changes to this library for use within an Android project in Android studio (which mostly affects the exact content declarations in the
+CMakeList.txt file) and added pt-internal.h from the Android Open Source project for use in Android Studio projects.
+
+For reference, tux-mind states about the libbthread library itself:
 
 libbthread
 ==========
@@ -24,21 +27,5 @@ Project is licensed under GNU LGPL v2.0 (Library General Public License)
 
 pt-internal.h - is from The Android Open Source Project and licensed under Apache License, Version 2.0
 
-building
-========
 
-```bash
-$ autoreconf -i
-$ export PATH="$PATH:/path/to/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin"
-$ target_host=aarch64-linux-android
-$ export AR=${target_host}-ar
-$ export AS=${target_host}-as
-$ export CC=${target_host}21-clang
-$ export CXX=${target_host}21-clang++
-$ export LD=${target_host}-ld
-$ export STRIP=${target_host}-strip
-$ export CFLAGS="-fPIE -fPIC"
-$ export LDFLAGS="-pie"
-$ ./configure --host=${target_host}
-$ make
-```
+
