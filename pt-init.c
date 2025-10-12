@@ -18,8 +18,8 @@
    Boston, MA 02111-1307, USA.  */
 
 #include <pthread.h>
-#include <bthread.h>
-#include <pt-internal.h>
+#include "bthread.h"
+#include "pt-internal.h"
 #include <signal.h>
 
 void pthread_cancel_handler(int signum) {

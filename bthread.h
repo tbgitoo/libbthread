@@ -25,7 +25,25 @@
 
 #define PTHREAD_CANCELED ((void *) -1)
 
-int pthread_setcancelstate (int , int *);
-int pthread_setcanceltype (int , int *);
-void pthread_testcancel (void);
+/**
+ * Implementation of the standard thread cancel state function based on pt-internal.h
+ * @param state New state to be set, Accepted values are PTHREAD_CANCEL_ENABLE, PTHREAD_CANCEL_DISABLE
+ * @param oldstate  A pointer where the function will store the previous state
+ * @return 0 on success, error code otherwise
+ */
+int pthread_setcancelstate (int state, int *oldstate);
+/** Set the type of cancellation (asynchronous, or deferred) that the thread undergoes when cancelled
+ *
+ * @param type The new cancel type PTHREAD_CANCEL_ASYNCHRONOUS or PTHREAD_CANCEL_DEFERRED
+ * @param oldtype A pointer to where the function will store the previous type
+ * @return 0 on success, error code otherwise
+ */
+
+int pthread_setcanceltype (int type, int *oldtype);
+
+/**
+ * Cancel a thread
+ * @param t Information struct for the thread
+ * @return 0 on success, error code otherwise
+ */
 int pthread_cancel (pthread_t t);

@@ -19,7 +19,7 @@
 
 #include <pthread.h>
 
-#include <pt-internal.h>
+#include "pt-internal.h"
 
 static void
 call_exit (void)
