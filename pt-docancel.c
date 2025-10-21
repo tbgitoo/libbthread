@@ -30,13 +30,13 @@ call_exit (void)
 int
 __pthread_do_cancel (struct pthread_internal_t *p)
 {
-	
-	if(p == (struct pthread_internal_t *)pthread_self())
-    call_exit ();
-  else if(p->attr.flags & PTHREAD_ATTR_FLAG_CANCEL_HANDLER)
-    pthread_kill((pthread_t)p, SIGRTMIN);
-	else
-		pthread_kill((pthread_t)p, SIGTERM);
 
-  return 0;
+    if(p == (struct pthread_internal_t *)pthread_self())
+        call_exit ();
+    else if(p->attr.flags & PTHREAD_ATTR_FLAG_CANCEL_HANDLER)
+        pthread_kill((pthread_t)p, SIGRTMIN);
+    else
+        pthread_kill((pthread_t)p, SIGTERM); // NOLINT(*-bad-signal-to-kill-thread)
+
+    return 0;
 }
