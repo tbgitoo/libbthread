@@ -25,33 +25,33 @@
 int
 pthread_setcancelstate (int state, int *oldstate)
 {
-  struct pthread_internal_t *p = (struct pthread_internal_t*)pthread_self();
-	int newflags;
+    struct pthread_internal_t *p = (struct pthread_internal_t*)pthread_self();
+    unsigned int newflags;
 
-	pthread_init();
-	
-  switch (state)
+    pthread_init();
+
+    switch (state)
     {
-    default:
-      return EINVAL;
-    case PTHREAD_CANCEL_ENABLE:
-    case PTHREAD_CANCEL_DISABLE:
-      break;
+        default:
+            return EINVAL;
+        case PTHREAD_CANCEL_ENABLE:
+        case PTHREAD_CANCEL_DISABLE:
+            break;
     }
 
-  pthread_mutex_lock (&p->cancel_lock);
-  if (oldstate)
-    *oldstate = p->attr.flags & PTHREAD_ATTR_FLAG_CANCEL_ENABLE;
-  
-	if(state == PTHREAD_ATTR_FLAG_CANCEL_ENABLE)
-		p->attr.flags |= PTHREAD_ATTR_FLAG_CANCEL_ENABLE;
-	else
-		p->attr.flags &= ~PTHREAD_ATTR_FLAG_CANCEL_ENABLE;
-	newflags=p->attr.flags;
-  pthread_mutex_unlock (&p->cancel_lock);
+    pthread_mutex_lock (&p->cancel_lock);
+    if (oldstate)
+        *oldstate = (int)p->attr.flags & PTHREAD_ATTR_FLAG_CANCEL_ENABLE;
 
-	if((newflags & PTHREAD_ATTR_FLAG_CANCEL_PENDING) && (newflags & PTHREAD_ATTR_FLAG_CANCEL_ENABLE) && (newflags & PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS))
-		__pthread_do_cancel(p);
-	
-  return 0;
+    if(state == PTHREAD_ATTR_FLAG_CANCEL_ENABLE)
+        p->attr.flags |= PTHREAD_ATTR_FLAG_CANCEL_ENABLE;
+    else
+        p->attr.flags &= ~PTHREAD_ATTR_FLAG_CANCEL_ENABLE;
+    newflags=p->attr.flags;
+    pthread_mutex_unlock (&p->cancel_lock);
+
+    if((newflags & PTHREAD_ATTR_FLAG_CANCEL_PENDING) && (newflags & PTHREAD_ATTR_FLAG_CANCEL_ENABLE) && (newflags & PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS))
+        __pthread_do_cancel(p);
+
+    return 0;
 }

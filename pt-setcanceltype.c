@@ -15,7 +15,13 @@
    You should have received a copy of the GNU Library General Public
    License along with the GNU C Library; see the file COPYING.LIB.  If not,
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   Boston, MA 02111-1307, USA.
+
+   Modification notice (2025):
+   Modified from original glibc: Changed flag handling
+   to use uint32_t flags and explicit int casting
+   for oldtype to address conversion warnings
+   */
 
 #include <pthread.h>
 #include "bthread.h"
@@ -25,33 +31,33 @@
 int
 pthread_setcanceltype (int type, int *oldtype)
 {
-  struct pthread_internal_t *p = (struct pthread_internal_t*)pthread_self();
-	int newflags;
-	
-	pthread_init();
-	
-  switch (type)
+    struct pthread_internal_t *p = (struct pthread_internal_t*)pthread_self();
+    unsigned int newflags;
+
+    pthread_init();
+
+    switch (type)
     {
-    default:
-      return EINVAL;
-    case PTHREAD_CANCEL_DEFERRED:
-    case PTHREAD_CANCEL_ASYNCHRONOUS:
-      break;
+        default:
+            return EINVAL;
+        case PTHREAD_CANCEL_DEFERRED:
+        case PTHREAD_CANCEL_ASYNCHRONOUS:
+            break;
     }
 
-  pthread_mutex_lock (&p->cancel_lock);
-  if (oldtype)
-    *oldtype = p->attr.flags & PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS;
-	
-	if(type == PTHREAD_CANCEL_ASYNCHRONOUS)
-		p->attr.flags |= PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS;
-	else
-		p->attr.flags &= ~PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS;
-	newflags=p->attr.flags;
-  pthread_mutex_unlock (&p->cancel_lock);
+    pthread_mutex_lock (&p->cancel_lock);
+    if (oldtype)
+        *oldtype = (int)p->attr.flags & PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS;
 
-	if((newflags & PTHREAD_ATTR_FLAG_CANCEL_PENDING) && (newflags & PTHREAD_ATTR_FLAG_CANCEL_ENABLE) && (newflags & PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS))
-		__pthread_do_cancel(p);
-	
-  return 0;
+    if(type == PTHREAD_CANCEL_ASYNCHRONOUS)
+        p->attr.flags |= PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS;
+    else
+        p->attr.flags &= ~PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS;
+    newflags=p->attr.flags;
+    pthread_mutex_unlock (&p->cancel_lock);
+
+    if((newflags & PTHREAD_ATTR_FLAG_CANCEL_PENDING) && (newflags & PTHREAD_ATTR_FLAG_CANCEL_ENABLE) && (newflags & PTHREAD_ATTR_FLAG_CANCEL_ASYNCRONOUS))
+        __pthread_do_cancel(p);
+
+    return 0;
 }
